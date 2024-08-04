@@ -123,18 +123,8 @@ index = Path("./Data/Sorted.json").read_text(encoding="utf-8")
 data = json.loads(index)
 lab_src = glob(r"./Data/sorted/**/*.lab",recursive=True)
 
-def get_path_by_lang(lang):
-    langcodes = ["CHS","EN","JP","KR"]
-    path = ['中文 - Chinese', '英语 - English',  '日语 - Japanese', '韩语 - Korean']
-    try:
-        i = langcodes.index(lang.Upper())
-        dest_path = path[i]
-    except:
-        print("不支持的语言")
-        exit()
-    return dest_path
 
-path_by_lang = get_path_by_lang(language);
+_, path_by_lang = get_support_lang(language);
 dest = args.final_destination
 for lab_file in tqdm(lab_src):
     try:
@@ -168,20 +158,6 @@ def tag_content(text):
     string = '、'.join(res)
     return string
 
-
-def get_path_by_lang(lang):
-    langcodes = ["CHS", "EN", "JP", "KR"]
-    path = ['中文 - Chinese', '英语 - English', '日语 - Japanese', '韩语 - Korean']
-    try:
-        i = langcodes.index(lang)
-        dest_path = path[i]
-    except:
-        print("不支持的语言")
-        exit()
-    return dest_path
-
-
-path_by_lang = get_path_by_lang(language);
 
 for file in tqdm(labfiles):
     try:
