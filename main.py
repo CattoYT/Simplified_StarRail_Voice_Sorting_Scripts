@@ -8,7 +8,7 @@ from shutil import copy, move
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p','--pck',type=str,help='Game Path for voice PCKs',default="C:/Program Files/HoYoPlay/games/Honkai Star Rail/Star Rail/Games/StarRail_Data/Persistent/Audio/AudioPackage/Windows")
+parser.add_argument('-p','--pck',type=str,help='Game Path for voice PCKs',default="C:/Program Files/HoYoPlay/games/Honkai Star Rail/Star Rail/Games")
 parser.add_argument("-l", "--language", type=str, help="Language of the voice pack", required=True)
 parser.add_argument('-w','--wav',type=str,help='Path for final wavs',default="./Data/wav")
 parser.add_argument("-m", "--mode", type=str, default="mv", help="Move or copy files into wav. Defaults to move")
@@ -18,7 +18,7 @@ parser.add_argument('-dst','--destination', type=str, help='Final output locatio
 args = parser.parse_args()
 
 
-pck_path = args.pck
+pck_path = args.pck + "/StarRail_Data/"
 wem_path = r"./Data/raw"
 wav_path = args.wav
 language = args.language
@@ -76,8 +76,8 @@ def get_support_lang(lang):
         i = langcodes.index(lang)
         dest_path = path[i]
     else:
-        print("Invalid Language!")
-        exit()
+        print("Invalid Language! Defaulting to EN")
+        dest_path = "英语 - English"
     return lang, dest_path
 
 
@@ -105,8 +105,8 @@ def sorting_voice(src, dst, mode, lang):
                 elif mode == "mv":
                     move(src_path, dst_path)
                 else:
-                    print("Invalid mode！")
-                    exit()
+                    print("Invalid mode！Defaulting to move")
+                    move(src_path, dst_path)
 
                 lab_file_path = f"{dst}/{dest_path}/{character}/{voice_file}.lab"
                 cleaned_lab = crean_text(text)
@@ -151,3 +151,49 @@ for lab_file in tqdm(lab_src):
 
 #part4
 
+tags = r'[<>]'
+
+labfiles = glob(f"{final_destination}/**/*.lab", recursive=True)
+
+
+def check_content(text, regx):
+    if re.search(regx, text):
+        return True
+    else:
+        return False
+
+
+def tag_content(text):
+    res = re.findall(r'(<.*?>)', text)
+    string = '、'.join(res)
+    return string
+
+
+def get_path_by_lang(lang):
+    langcodes = ["CHS", "EN", "JP", "KR"]
+    path = ['中文 - Chinese', '英语 - English', '日语 - Japanese', '韩语 - Korean']
+    try:
+        i = langcodes.index(lang)
+        dest_path = path[i]
+    except:
+        print("不支持的语言")
+        exit()
+    return dest_path
+
+
+path_by_lang = get_path_by_lang(language);
+
+for file in tqdm(labfiles):
+    try:
+        lab_content = Path(file).read_text(encoding='utf-8')
+        spk = os.path.basename(os.path.dirname(file))
+        lab_file_name = os.path.basename(file)
+        wav_file_name = lab_file_name.replace(".lab", ".wav")
+        src = f"{final_destination}/{path_by_lang}/{spk}"
+        if check_content(lab_content, tags):
+            labels = re.sub(r'<.*?>', '', lab_content)
+            lab_path = f"{src}/{lab_file_name}"
+            Path(lab_path).write_text(labels, encoding='utf-8')
+            tqdm.write(f"已清除标注文件 {src}/{lab_file_name} 中的html标签：{tag_content(lab_content)}\n-----------")
+    except:
+        pass
