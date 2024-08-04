@@ -4,9 +4,9 @@ from tqdm import  tqdm
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p','--pck',type=str,help='pck文件目录',default="./Data/pcks")
-parser.add_argument('-r','--wem',type=str,help='wem输出目录',default="./Data/raw")
-parser.add_argument('-w','--wav',type=str,help='wav输出目录',default="./Data/wav")
+parser.add_argument('-p','--pck',type=str,help='Game Path for vocie PCKs',default="C:/Program Files/HoYoPlay/games/Honkai Star Rail/Star Rail/Games/StarRail_Data/Persistent/Audio/AudioPackage/Windows")
+parser.add_argument('-r','--wem',type=str,help='Path for extracted PCKs (wems)',default="./Data/raw")
+parser.add_argument('-w','--wav',type=str,help='Path for final wavs',default="./Data/wav")
 args = parser.parse_args()
 
 pck_path = args.pck
